@@ -1,0 +1,27 @@
+<!-- templates/user_qr_code.html -->
+{% extends "_layout.html" %}
+
+{% block title %}Login QR-kodi: {{ user.username }}{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-md-6 text-center">
+        <div class="card shadow-sm">
+            <div class="card-header">
+                <h3>Xodim: {{ user.username }}</h3>
+            </div>
+            <div class="card-body">
+                <p>Ushbu QR-kodni login sahifasida skanerlash orqali tizimga parolsiz kirish mumkin.</p>
+                <img src="data:image/png;base64,{{ qr_code }}" alt="Login QR Code for {{ user.username }}" class="img-fluid border rounded p-2">
+                <div class="alert alert-warning mt-3">
+                    <i class="bi bi-exclamation-triangle"></i> Bu QR-kodni begona shaxslarga bermang!
+                </div>
+                <div class="mt-3">
+                    <a href="{{ url_for('users_page') }}" class="btn btn-secondary">Orqaga</a>
+                    <button class="btn btn-primary" onclick="window.print()"><i class="bi bi-printer"></i> Chop Etish</button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

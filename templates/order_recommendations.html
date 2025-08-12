@@ -1,0 +1,50 @@
+<!-- templates/order_recommendations.html -->
+{% extends "_layout.html" %}
+
+{% block title %}Avtomatik Buyurtma Tavsiyalari{% endblock %}
+
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-3">
+    <h1>Avtomatik Buyurtma Tavsiyalari</h1>
+</div>
+
+<div class="card shadow-sm">
+    <div class="card-header">
+        <p class="mb-0">Ushbu ro'yxat ombordagi qoldiq va so'nggi 30 kunlik sotuvlar tahlili asosida avtomatik shakllantirildi.</p>
+    </div>
+    <div class="card-body">
+        <div class="table-responsive">
+            <table class="table table-hover align-middle">
+                <thead class="table-light">
+                    <tr>
+                        <th>ID</th>
+                        <th>Nomi</th>
+                        <th>Joriy Qoldiq</th>
+                        <th>Tavsiya Etilgan Miqdor</th>
+                        <th>Sababi</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for item in recommendations %}
+                    <tr>
+                        <td>{{ item.id }}</td>
+                        <td>{{ item.name }}</td>
+                        <td><span class="badge bg-warning text-dark">{{ item.quantity }} dona</span></td>
+                        <td><span class="badge bg-success">+ {{ item.recommended_order }} dona</span></td>
+                        <td>
+                            {% if item.reason == 'Qoldiq kam' %}
+                                <span class="badge bg-danger">{{ item.reason }}</span>
+                            {% else %}
+                                <span class="badge bg-info">{{ item.reason }}</span>
+                            {% endif %}
+                        </td>
+                    </tr>
+                    {% else %}
+                    <tr><td colspan="5" class="text-center">Hozircha buyurtma uchun tavsiyalar mavjud emas.</td></tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,83 @@
+<!-- templates/cashier_performance.html -->
+{% extends "_layout.html" %}
+
+{% block title %}Sotuvchilar Reytingi{% endblock %}
+
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <h1>Sotuvchilar Reytingi</h1>
+    <span class="badge bg-secondary">Oxirgi 30 kun</span>
+</div>
+
+<!-- Eng Yaxshi Sotuvchi -->
+{% if cashiers %}
+    {% set top_cashier = cashiers[0] %}
+    <div class="card shadow-sm mb-4 border-2 border-warning">
+        <div class="card-body text-center">
+            <h3 class="card-title"><i class="bi bi-trophy-fill text-warning"></i> Oyning Eng Yaxshi Sotuvchisi</h3>
+            <h2 class="display-4">{{ top_cashier.username }}</h2>
+            <!-- TUZATILGAN NARX FORMATI -->
+            <p class="lead text-success fw-bold">{{ (top_cashier.total_sales_amount or 0) | format_currency }} so'mlik sotuv</p>
+            <div class="alert alert-success">
+                <i class="bi bi-award-fill"></i> Mukofotga loyiqsiz va oyligingizga qo'shimcha mukofot olasiz!
+            </div>
+        </div>
+    </div>
+{% endif %}
+
+<!-- Barcha Sotuvchilar Ro'yxati -->
+<div class="card shadow-sm">
+    <div class="card-header">
+        <h4>Umumiy Reyting</h4>
+    </div>
+    <div class="card-body">
+        <div class="table-responsive">
+            <table class="table table-hover align-middle">
+                <thead class="table-light">
+                    <tr>
+                        <th>O'rin</th>
+                        <th>Sotuvchi</th>
+                        <th>Umumiy Sotuv</th>
+                        <th>Sotilgan Mahsulotlar</th>
+                        <th>Reyting</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for cashier in cashiers %}
+                    <tr>
+                        <td class="fw-bold fs-5">#{{ loop.index }}</td>
+                        <td>
+                            <div class="d-flex align-items-center">
+                                <i class="bi bi-person-circle fs-3 me-2"></i>
+                                <span>{{ cashier.username }}</span>
+                            </div>
+                        </td>
+                        <!-- TUZATILGAN NARX FORMATI -->
+                        <td class="fw-bold">{{ (cashier.total_sales_amount or 0) | format_currency }} so'm</td>
+                        <td>{{ cashier.total_items_sold or 0 }} dona</td>
+                        <td>
+                            <div class="d-flex align-items-center">
+                                <div class="stars-container me-2 fs-5">
+                                    {% for i in range(5) %}
+                                        {% if i < cashier.stars_filled %}
+                                            <i class="bi bi-star-fill text-warning"></i>
+                                        {% else %}
+                                            <i class="bi bi-star text-muted"></i>
+                                        {% endif %}
+                                    {% endfor %}
+                                </div>
+                                <span class="badge bg-light text-dark">{{ cashier.points }} ball</span>
+                            </div>
+                        </td>
+                    </tr>
+                    {% else %}
+                    <tr>
+                        <td colspan="5" class="text-center">Oxirgi 30 kunda kassirlar tomonidan sotuvlar amalga oshirilmagan.</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+{% endblock %}

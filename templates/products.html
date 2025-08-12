@@ -1,0 +1,49 @@
+<!-- templates/products.html -->
+{% extends "_layout.html" %}
+
+{% block title %}Mahsulotlarni Boshqarish{% endblock %}
+
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-3">
+    <h1>Mahsulotlar Ro'yxati</h1>
+    <a href="{{ url_for('add_product_page') }}" class="btn btn-success"><i class="bi bi-plus-circle"></i> Yangi Mahsulot</a>
+</div>
+
+<div class="card shadow-sm">
+    <div class="card-body">
+        <form method="GET" action="{{ url_for('products_page') }}" class="mb-3">
+            <div class="input-group">
+                <input type="text" class="form-control" placeholder="Mahsulot nomini kiriting..." name="q" value="{{ search_term }}">
+                <button class="btn btn-outline-secondary" type="submit"><i class="bi bi-search"></i> Qidirish</button>
+            </div>
+        </form>
+        <div class="table-responsive">
+            <table class="table table-hover align-middle">
+                <thead class="table-light">
+                    <tr><th>ID</th><th>Nomi</th><th>Tannarxi</th><th>Sotuv Narxi</th><th>Miqdori</th><th class="text-end">Amallar</th></tr>
+                </thead>
+                <tbody>
+                    {% for product in products %}
+                    <tr>
+                        <td>{{ product.id }}</td>
+                        <td>{{ product.name }}</td>
+                        <td>{{ product.cost_price | format_currency }} so'm</td>
+                        <td>{{ product.price | format_currency }} so'm</td>
+                        <td>{{ product.quantity }}</td>
+                        <td class="text-end">
+                            <a href="{{ url_for('qr_code_page', product_id=product.id) }}" class="btn btn-secondary btn-sm" title="QR-kod"><i class="bi bi-qr-code"></i></a>
+                            <a href="{{ url_for('edit_product_page', product_id=product.id) }}" class="btn btn-primary btn-sm" title="Tahrirlash"><i class="bi bi-pencil-square"></i></a>
+                            <form action="{{ url_for('delete_product_route', product_id=product.id) }}" method="POST" class="d-inline" onsubmit="return confirm('Rostdan ham bu mahsulotni o\'chirmoqchimisiz?');">
+                                <button type="submit" class="btn btn-danger btn-sm" title="O'chirish"><i class="bi bi-trash"></i></button>
+                            </form>
+                        </td>
+                    </tr>
+                    {% else %}
+                    <tr><td colspan="6" class="text-center">Mahsulotlar topilmadi.</td></tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+{% endblock %}

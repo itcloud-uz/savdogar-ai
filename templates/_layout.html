@@ -1,0 +1,151 @@
+<!-- templates/_layout.html -->
+<!DOCTYPE html>
+<html lang="uz">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}Savdogar AI{% endblock %}</title>
+    
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+    
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    
+    <style>
+        :root {
+            --sidebar-width: 280px;
+            --sidebar-glass-bg: rgba(17, 24, 39, 0.85);
+            --main-bg: #F9FAFB;
+            --link-color: #D1D5DB;
+            --link-hover-bg: rgba(55, 65, 81, 0.6);
+            --link-active-bg: #03b57b;
+            --card-glass-bg: rgba(255, 255, 255, 0.7);
+        }
+        body { font-family: 'Inter', sans-serif; background-color: var(--main-bg); overflow-x: hidden; }
+        .main-wrapper { display: flex; min-height: 100vh; }
+        .sidebar { width: var(--sidebar-width); background: var(--sidebar-glass-bg); backdrop-filter: blur(15px); -webkit-backdrop-filter: blur(15px); border-right: 1px solid rgba(255, 255, 255, 0.1); color: white; position: fixed; top: 0; left: 0; bottom: 0; display: flex; flex-direction: column; transition: margin-left 0.3s; }
+        .sidebar-header { padding: 1.5rem 1.5rem; font-size: 1.5rem; font-weight: 700; text-align: center; border-bottom: 1px solid rgba(255, 255, 255, 0.1); }
+        .sidebar-header a { color: white; text-decoration: none; }
+        .sidebar-nav { flex-grow: 1; list-style: none; padding: 1rem 0; margin: 0; }
+        .sidebar-nav a { display: flex; align-items: center; padding: 0.8rem 1.5rem; color: var(--link-color); text-decoration: none; font-weight: 500; transition: background-color 0.2s, color 0.2s; margin: 0.25rem 0.75rem; border-radius: 0.5rem; }
+        .sidebar-nav a:hover { background-color: var(--link-hover-bg); color: white; }
+        .sidebar-nav a.active { background-color: var(--link-active-bg); color: white; box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1); }
+        .sidebar-nav i { font-size: 1.2rem; margin-right: 1rem; width: 24px; }
+        .sidebar-footer { padding: 1rem 1.5rem; border-top: 1px solid rgba(255, 255, 255, 0.1); font-size: 0.8rem; }
+        .main-content { margin-left: var(--sidebar-width); flex-grow: 1; padding: 2rem; transition: margin-left 0.3s; }
+        .card { background: var(--card-glass-bg); backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px); border: 1px solid rgba(255, 255, 255, 0.2); box-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.05); }
+        .mobile-header { display: none; }
+        @media (max-width: 992px) {
+            .sidebar { margin-left: - var(--sidebar-width); }
+            .main-content { margin-left: 0; }
+            .mobile-header { display: flex; justify-content: space-between; align-items: center; padding: 1rem; background: rgba(255, 255, 255, 0.7); backdrop-filter: blur(10px); box-shadow: 0 2px 4px rgba(0,0,0,0.1); }
+            .mobile-header .navbar-brand { color: #111827; font-weight: 700; }
+        }
+    </style>
+</head>
+<body>
+    <div class="main-wrapper">
+        <div class="sidebar d-none d-lg-flex" id="desktop-sidebar">
+            <div class="sidebar-header"><a href="{{ url_for('home') }}">Savdogar AI</a></div>
+            <ul class="sidebar-nav">
+                {% if session.user.role == 'admin' %}
+                    <li><a class="{% if request.endpoint == 'admin_dashboard' %}active{% endif %}" href="{{ url_for('admin_dashboard') }}"><i class="bi bi-pie-chart"></i> Analitika</a></li>
+                    <li><a class="{% if request.endpoint == 'cashier_dashboard' %}active{% endif %}" href="{{ url_for('cashier_dashboard') }}"><i class="bi bi-cart4"></i> Sotuv Paneli</a></li>
+                    <li><a class="{% if 'customer' in request.endpoint %}active{% endif %}" href="{{ url_for('customers_page') }}"><i class="bi bi-person-rolodex"></i> Mijozlar</a></li>
+                    <li><a class="{% if 'product' in request.endpoint %}active{% endif %}" href="{{ url_for('products_page') }}"><i class="bi bi-box-seam"></i> Mahsulotlar</a></li>
+                    <li><a class="{% if 'user' in request.endpoint %}active{% endif %}" href="{{ url_for('users_page') }}"><i class="bi bi-people"></i> Xodimlar</a></li>
+                    <li><a class="{% if request.endpoint == 'cashier_performance_page' %}active{% endif %}" href="{{ url_for('cashier_performance_page') }}"><i class="bi bi-trophy"></i> Sotuvchilar Reytingi</a></li>
+                    <li><a class="{% if request.endpoint == 'reports_page' %}active{% endif %}" href="{{ url_for('reports_page') }}"><i class="bi bi-file-earmark-bar-graph"></i> Sotuvlar Hisoboti</a></li>
+                    <li><a class="{% if request.endpoint == 'expenses_page' %}active{% endif %}" href="{{ url_for('expenses_page') }}"><i class="bi bi-wallet2"></i> Xarajatlar</a></li>
+                    <li><a class="{% if request.endpoint == 'order_recommendations_page' %}active{% endif %}" href="{{ url_for('order_recommendations_page') }}"><i class="bi bi-lightbulb"></i> Buyurtma Tavsiyalari</a></li>
+                    <li><a class="{% if request.endpoint == 'inventory_history_page' %}active{% endif %}" href="{{ url_for('inventory_history_page') }}"><i class="bi bi-clock-history"></i> Ombor Tarixi</a></li>
+                {% elif session.user.role == 'cashier' %}
+                    <li><a class="active" href="{{ url_for('cashier_dashboard') }}"><i class="bi bi-cart4"></i> Sotuv Paneli</a></li>
+                {% elif session.user.role == 'warehouse' %}
+                    <li><a class="{% if request.endpoint == 'warehouse_dashboard' %}active{% endif %}" href="{{ url_for('warehouse_dashboard') }}"><i class="bi bi-house-door"></i> Ombor Paneli</a></li>
+                    <li><a class="{% if request.endpoint == 'order_recommendations_page' %}active{% endif %}" href="{{ url_for('order_recommendations_page') }}"><i class="bi bi-lightbulb"></i> Buyurtma Tavsiyalari</a></li>
+                {% endif %}
+            </ul>
+            <div class="sidebar-footer">
+                <div class="d-flex align-items-center mb-3">
+                    <i class="bi bi-person-circle fs-3 me-2"></i>
+                    <div><div class="fw-bold">{{ session.user.username }}</div><small class="text-white-50">{{ session.user.role|capitalize }}</small></div>
+                </div>
+                <div class="d-grid mb-3"><a href="{{ url_for('logout') }}" class="btn btn-outline-light btn-sm"><i class="bi bi-box-arrow-right"></i> Chiqish</a></div>
+                <hr class="text-white-50">
+                <div class="text-center text-white-50">
+                    <small>Texnik Yordam:</small>
+                    <div class="mt-1">
+                        <small class="fw-bold text-white">Ishlab chiqaruvchi: ITC</small><br>
+                        <a href="mailto:itclouduz@gmail.com" class="text-decoration-none text-white-50"><i class="bi bi-envelope"></i> itclouduz@gmail.com</a><br>
+                        <a href="tel:+998911873730" class="text-decoration-none text-white-50"><i class="bi bi-telephone"></i> +998911873730</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="offcanvas offcanvas-start" tabindex="-1" id="mobile-sidebar" style="width: var(--sidebar-width); background: var(--sidebar-glass-bg); backdrop-filter: blur(15px); -webkit-backdrop-filter: blur(15px); border-right: 1px solid rgba(255, 255, 255, 0.2);">
+            <div class="offcanvas-header border-bottom border-secondary"><h5 class="offcanvas-title text-white">Savdogar AI</h5><button type="button" class="btn-close btn-close-white" data-bs-dismiss="offcanvas" aria-label="Close"></button></div>
+            <div class="offcanvas-body d-flex flex-column p-0">
+                <ul class="sidebar-nav">
+                    {% if session.user.role == 'admin' %}
+                        <li><a class="{% if request.endpoint == 'admin_dashboard' %}active{% endif %}" href="{{ url_for('admin_dashboard') }}"><i class="bi bi-pie-chart"></i> Analitika</a></li>
+                        <li><a class="{% if request.endpoint == 'cashier_dashboard' %}active{% endif %}" href="{{ url_for('cashier_dashboard') }}"><i class="bi bi-cart4"></i> Sotuv Paneli</a></li>
+                        <li><a class="{% if 'customer' in request.endpoint %}active{% endif %}" href="{{ url_for('customers_page') }}"><i class="bi bi-person-rolodex"></i> Mijozlar</a></li>
+                        <li><a class="{% if 'product' in request.endpoint %}active{% endif %}" href="{{ url_for('products_page') }}"><i class="bi bi-box-seam"></i> Mahsulotlar</a></li>
+                        <li><a class="{% if 'user' in request.endpoint %}active{% endif %}" href="{{ url_for('users_page') }}"><i class="bi bi-people"></i> Xodimlar</a></li>
+                        <li><a class="{% if request.endpoint == 'cashier_performance_page' %}active{% endif %}" href="{{ url_for('cashier_performance_page') }}"><i class="bi bi-trophy"></i> Sotuvchilar Reytingi</a></li>
+                        <li><a class="{% if request.endpoint == 'reports_page' %}active{% endif %}" href="{{ url_for('reports_page') }}"><i class="bi bi-file-earmark-bar-graph"></i> Sotuvlar Hisoboti</a></li>
+                        <li><a class="{% if request.endpoint == 'expenses_page' %}active{% endif %}" href="{{ url_for('expenses_page') }}"><i class="bi bi-wallet2"></i> Xarajatlar</a></li>
+                        <li><a class="{% if request.endpoint == 'order_recommendations_page' %}active{% endif %}" href="{{ url_for('order_recommendations_page') }}"><i class="bi bi-lightbulb"></i> Buyurtma Tavsiyalari</a></li>
+                        <li><a class="{% if request.endpoint == 'inventory_history_page' %}active{% endif %}" href="{{ url_for('inventory_history_page') }}"><i class="bi bi-clock-history"></i> Ombor Tarixi</a></li>
+                    {% elif session.user.role == 'cashier' %}
+                        <li><a class="active" href="{{ url_for('cashier_dashboard') }}"><i class="bi bi-cart4"></i> Sotuv Paneli</a></li>
+                    {% elif session.user.role == 'warehouse' %}
+                        <li><a class="{% if request.endpoint == 'warehouse_dashboard' %}active{% endif %}" href="{{ url_for('warehouse_dashboard') }}"><i class="bi bi-house-door"></i> Ombor Paneli</a></li>
+                        <li><a class="{% if request.endpoint == 'order_recommendations_page' %}active{% endif %}" href="{{ url_for('order_recommendations_page') }}"><i class="bi bi-lightbulb"></i> Buyurtma Tavsiyalari</a></li>
+                    {% endif %}
+                </ul>
+                <div class="sidebar-footer mt-auto">
+                    <div class="d-flex align-items-center mb-3">
+                        <i class="bi bi-person-circle fs-3 me-2 text-white"></i>
+                        <div class="text-white"><div class="fw-bold">{{ session.user.username }}</div><small class="text-white-50">{{ session.user.role|capitalize }}</small></div>
+                    </div>
+                    <div class="d-grid mb-3"><a href="{{ url_for('logout') }}" class="btn btn-outline-light btn-sm"><i class="bi bi-box-arrow-right"></i> Chiqish</a></div>
+                     <hr class="text-white-50">
+                    <div class="text-center text-white-50">
+                        <small>Texnik Yordam:</small>
+                        <div class="mt-1">
+                            <small class="fw-bold text-white">Ishlab chiqaruvchi: ITC</small><br>
+                            <a href="mailto:itclouduz@gmail.com" class="text-decoration-none text-white-50"><i class="bi bi-envelope"></i> itclouduz@gmail.com</a><br>
+                            <a href="tel:+998911873730" class="text-decoration-none text-white-50"><i class="bi bi-telephone"></i> +998911873730</a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="main-content">
+            <header class="mobile-header d-lg-none">
+                <a class="navbar-brand" href="{{ url_for('home') }}">Savdogar AI</a>
+                <button class="btn btn-outline-secondary" type="button" data-bs-toggle="offcanvas" data-bs-target="#mobile-sidebar"><i class="bi bi-list"></i></button>
+            </header>
+            <main class="mt-4 mt-lg-0">
+                {% with messages = get_flashed_messages(with_categories=true) %}
+                    {% if messages %}
+                        {% for category, message in messages %}
+                            <div class="alert alert-{{ category }} alert-dismissible fade show" role="alert">
+                                {{ message }}
+                                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                            </div>
+                        {% endfor %}
+                    {% endif %}
+                {% endwith %}
+                {% block content %}{% endblock %}
+            </main>
+        </div>
+    </div>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+    {% block scripts %}{% endblock %}
+</body>
+</html>

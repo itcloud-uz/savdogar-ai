@@ -1,0 +1,44 @@
+<!-- templates/customers.html -->
+{% extends "_layout.html" %}
+
+{% block title %}Mijozlar Bazasi{% endblock %}
+
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-3">
+    <h1>Mijozlar Ro'yxati</h1>
+    <a href="{{ url_for('add_customer_page') }}" class="btn btn-success"><i class="bi bi-person-plus"></i> Yangi Mijoz</a>
+</div>
+
+<div class="card shadow-sm">
+    <div class="card-body">
+        <form method="GET" action="{{ url_for('customers_page') }}" class="mb-3">
+            <div class="input-group">
+                <input type="text" class="form-control" placeholder="Ism yoki telefon raqami bo'yicha qidirish..." name="q" value="{{ search_term }}">
+                <button class="btn btn-outline-secondary" type="submit"><i class="bi bi-search"></i> Qidirish</button>
+            </div>
+        </form>
+        <div class="table-responsive">
+            <table class="table table-hover align-middle">
+                <thead class="table-light">
+                    <tr><th>ID</th><th>Ismi</th><th>Telefon Raqami</th><th>Bonus Ballari</th><th class="text-end">Amallar</th></tr>
+                </thead>
+                <tbody>
+                    {% for customer in customers %}
+                    <tr>
+                        <td>{{ customer.id }}</td>
+                        <td>{{ customer.name }}</td>
+                        <td>{{ customer.phone_number }}</td>
+                        <td><i class="bi bi-gem text-primary"></i> {{ customer.bonus_points }}</td>
+                        <td class="text-end">
+                            <a href="{{ url_for('edit_customer_page', customer_id=customer.id) }}" class="btn btn-primary btn-sm" title="Tahrirlash"><i class="bi bi-pencil-square"></i></a>
+                        </td>
+                    </tr>
+                    {% else %}
+                    <tr><td colspan="5" class="text-center">Mijozlar topilmadi.</td></tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+{% endblock %}

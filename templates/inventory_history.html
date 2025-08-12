@@ -1,0 +1,53 @@
+<!-- templates/inventory_history.html -->
+{% extends "_layout.html" %}
+
+{% block title %}Ombor Harakatlari Tarixi{% endblock %}
+
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-3">
+    <h1>Ombor Harakatlari Tarixi</h1>
+</div>
+
+<div class="card shadow-sm">
+    <div class="card-body">
+        <div class="table-responsive">
+            <table class="table table-striped table-hover">
+                <thead class="table-light">
+                    <tr>
+                        <th>Sana</th>
+                        <th>Mahsulot</th>
+                        <th>Harakat Turi</th>
+                        <th>Miqdor O'zgarishi</th>
+                        <th>Foydalanuvchi</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for move in history %}
+                    <tr>
+                        <td>{{ move.movement_date.strftime('%Y-%m-%d %H:%M') }}</td>
+                        <td>{{ move.product_name }}</td>
+                        <td>
+                            {% if move.movement_type == 'kirim' %}
+                                <span class="badge bg-success">Kirim</span>
+                            {% elif move.movement_type == 'chiqim' %}
+                                <span class="badge bg-warning text-dark">Chiqim</span>
+                            {% elif move.movement_type == 'sotuv' %}
+                                <span class="badge bg-danger">Sotuv</span>
+                            {% else %}
+                                <span class="badge bg-secondary">{{ move.movement_type }}</span>
+                            {% endif %}
+                        </td>
+                        <td class="fw-bold {% if move.quantity_change > 0 %}text-success{% else %}text-danger{% endif %}">
+                           {{ move.quantity_change }}
+                        </td>
+                        <td>{{ move.user_name }}</td>
+                    </tr>
+                    {% else %}
+                    <tr><td colspan="5" class="text-center">Harakatlar tarixi mavjud emas.</td></tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+{% endblock %}

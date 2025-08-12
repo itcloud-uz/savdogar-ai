@@ -1,0 +1,50 @@
+<!-- templates/receipt.html -->
+<!DOCTYPE html>
+<html lang="uz">
+<head>
+    <meta charset="UTF-8">
+    <title>Chek #{{ sale.id }}</title>
+    <style>
+        body { font-family: 'Courier New', Courier, monospace; width: 300px; margin: 0 auto; padding: 20px; }
+        .receipt-header { text-align: center; margin-bottom: 20px; }
+        .receipt-header h3 { margin: 0; }
+        .receipt-header p { margin: 5px 0; font-size: 12px; }
+        table { width: 100%; border-collapse: collapse; font-size: 12px; }
+        th, td { padding: 5px 0; }
+        .product-row td { border-bottom: 1px dashed #ccc; }
+        .text-right { text-align: right; }
+        .total-section { margin-top: 15px; font-weight: bold; }
+        .footer { text-align: center; margin-top: 20px; font-size: 12px; }
+        @media print {
+            body { width: 80mm; padding: 0; }
+            .no-print { display: none; }
+        }
+    </style>
+</head>
+<body>
+    <div class="receipt-header">
+        <h3>Savdogar AI</h3>
+        <p>Xaridingiz uchun rahmat!</p>
+        <hr>
+        <p>Chek #{{ sale.id }} | Sana: {{ sale.sale_date.strftime('%Y-%m-%d %H:%M') }}</p>
+        <p>Kassir: {{ sale.cashier_name }}</p>
+        {% if sale.customer_name %}
+        <p>Mijoz: {{ sale.customer_name }}</p>
+        {% endif %}
+    </div>
+    <table>
+        <thead><tr><th>Mahsulot</th><th class="text-right">Miqdor</th><th class="text-right">Jami</th></tr></thead>
+        <tbody>
+            <tr class="product-row">
+                <td>{{ sale.product_name }}</td>
+                <td class="text-right">{{ sale.quantity }}</td>
+                <td class="text-right">{{ sale.total_amount | format_currency }}</td>
+            </tr>
+        </tbody>
+    </table>
+    <div class="total-section">
+        <table><tr><td>Jami to'lov:</td><td class="text-right">{{ sale.total_amount | format_currency }} so'm</td></tr></table>
+    </div>
+    <div class="footer"><p>Sog' bo'ling, salomat bo'ling!</p></div>
+</body>
+</html>

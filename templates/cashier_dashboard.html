@@ -1,0 +1,173 @@
+<!-- templates/cashier_dashboard.html -->
+{% extends "_layout.html" %}
+
+{% block title %}Kassir Paneli{% endblock %}
+
+{% block content %}
+<div class="row g-4 justify-content-center">
+    <!-- Sotuv Amaliyoti Paneli -->
+    <div class="col-lg-7">
+        <div class="card shadow-sm">
+            <div class="card-header"><h3>Sotuv Amaliyoti</h3></div>
+            <div class="card-body">
+                <!-- Xatolik xabarlari uchun maxsus joy -->
+                <div id="sale-message-container"></div>
+
+                <form id="sale-form">
+                    <div class="mb-3">
+                        <label for="customer_id" class="form-label">Mijoz (ixtiyoriy)</label>
+                        <select class="form-select" id="customer_id" name="customer_id">
+                            <option value="">-- Doimiy mijoz emas --</option>
+                            {% for customer in customers %}
+                                <option value="{{ customer.id }}">{{ customer.name }} ({{ customer.phone_number }})</option>
+                            {% else %}
+                                <option value="" disabled>Mijozlar bazasi bo'sh</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                    <div class="mb-3">
+                        <label for="product_id" class="form-label">Mahsulotni tanlang yoki skanerlang</label>
+                        <select class="form-select" id="product_id" name="product_id" required>
+                            <option value="" disabled selected>-- Mahsulot --</option>
+                            {% for product in products %}{% if product.quantity > 0 %}<option value="{{ product.id }}">{{ product.name }} (Qoldiq: {{ product.quantity }})</option>{% endif %}{% endfor %}
+                        </select>
+                    </div>
+                    <div class="mb-3">
+                        <label for="quantity" class="form-label">Miqdori</label>
+                        <input type="number" class="form-control" id="quantity" name="quantity" min="1" value="1" required>
+                    </div>
+                    <div class="d-grid">
+                        <button type="submit" class="btn btn-success btn-lg"><i class="bi bi-cart-check"></i> Sotish va Chekni Ko'rish</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- QR Skaner Paneli -->
+    <div class="col-lg-5">
+        <div class="card shadow-sm">
+            <div class="card-header"><h3 class="mb-0"><i class="bi bi-qr-code-scan"></i> QR Skaner</h3></div>
+            <div class="card-body text-center">
+                <div id="qr-reader" style="width:100%;"></div>
+                <div id="qr-reader-results" class="mt-3"></div>
+                <button id="start-scan-btn" class="btn btn-primary mt-2">Skanerlashni Boshlash</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Chek uchun Modal (Yangi) -->
+<div class="modal fade" id="receiptModal" tabindex="-1" aria-labelledby="receiptModalLabel" aria-hidden="true">
+  <div class="modal-dialog" style="max-width: 350px;">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="receiptModalLabel">Sotuv Cheki</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close" onclick="window.location.reload()"></button>
+      </div>
+      <div class="modal-body">
+        <iframe id="receiptFrame" src="about:blank" style="width: 100%; height: 500px; border: none;"></iframe>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal" onclick="window.location.reload()">Yopish</button>
+        <button type="button" class="btn btn-primary" onclick="document.getElementById('receiptFrame').contentWindow.print();"><i class="bi bi-printer"></i> Chop Etish</button>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script src="https://unpkg.com/html5-qrcode" type="text/javascript"></script>
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+        const saleForm = document.getElementById('sale-form');
+        const messageContainer = document.getElementById('sale-message-container');
+        const receiptModal = new bootstrap.Modal(document.getElementById('receiptModal'));
+        const receiptFrame = document.getElementById('receiptFrame');
+
+        function showSaleMessage(message, type = 'danger') {
+            messageContainer.innerHTML = `<div class="alert alert-${type} alert-dismissible fade show" role="alert">
+                ${message}
+                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+            </div>`;
+        }
+
+        saleForm.addEventListener('submit', function(e) {
+            e.preventDefault();
+            const formData = new FormData(saleForm);
+            fetch("{{ url_for('sell_product') }}", {
+                method: 'POST',
+                body: formData
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.status === 'success' && data.receipt_url) {
+                    // Chekni modal ichidagi iframe'ga yuklash
+                    receiptFrame.src = data.receipt_url;
+                    // Modalni ochish
+                    receiptModal.show();
+                } else {
+                    showSaleMessage(data.message || 'Kutilmagan xatolik yuz berdi.');
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                showSaleMessage('Server bilan bog\'lanishda xatolik yuz berdi.');
+            });
+        });
+
+        // QR Skaner qismi
+        const startScanBtn = document.getElementById('start-scan-btn');
+        const productSelect = document.getElementById('product_id');
+        const quantityInput = document.getElementById('quantity');
+        let html5QrCode;
+
+        function onScanSuccess(decodedText, decodedResult) {
+            const match = decodedText.match(/ID: (\d+)/);
+            if (match && match[1]) {
+                const productId = match[1];
+                if ([...productSelect.options].some(option => option.value == productId)) {
+                    productSelect.value = productId;
+                    quantityInput.focus();
+                    stopScanning();
+                    showScannerMessage('Mahsulot muvaffaqiyatli topildi!', 'success');
+                } else {
+                    showScannerMessage('Ushbu mahsulot ro\'yxatda yo\'q yoki qoldig\'i tugagan.', 'danger');
+                }
+            } else {
+                showScannerMessage('QR-kod formati noto\'g\'ri.', 'warning');
+            }
+        }
+        function onScanFailure(error) {}
+        function showScannerMessage(message, type = 'info') {
+            document.getElementById('qr-reader-results').innerHTML = `<div class="alert alert-${type}">${message}</div>`;
+        }
+        function startScanning() {
+            startScanBtn.disabled = true;
+            startScanBtn.innerHTML = '<span class="spinner-border spinner-border-sm"></span> Kutmoqda...';
+            html5QrCode = new Html5Qrcode("qr-reader");
+            html5QrCode.start({ facingMode: "environment" }, { fps: 10, qrbox: { width: 250, height: 250 } }, onScanSuccess, onScanFailure)
+                .then(() => {
+                    startScanBtn.style.display = 'none';
+                    showScannerMessage('Kamerani QR-kodga qarating.');
+                })
+                .catch(err => {
+                    showScannerMessage('Kamerani ishga tushirib bo\'lmadi.', 'danger');
+                    startScanBtn.disabled = false;
+                    startScanBtn.innerHTML = 'Qaytadan Urinish';
+                });
+        }
+        function stopScanning() {
+            if (html5QrCode && html5QrCode.isScanning) {
+                html5QrCode.stop().then(() => {
+                    startScanBtn.style.display = 'block';
+                    startScanBtn.disabled = false;
+                    startScanBtn.innerHTML = 'Yangi Skanerlash';
+                });
+            }
+        }
+        startScanBtn.addEventListener('click', startScanning);
+    });
+</script>
+{% endblock %}

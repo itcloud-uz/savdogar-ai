@@ -1,0 +1,12 @@
+# Virtual muhit
+venv/
+
+# Python cache fayllari
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+
+# IDE sozlamalari
+.vscode/
+.idea/

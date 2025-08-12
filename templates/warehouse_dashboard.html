@@ -1,0 +1,66 @@
+<!-- templates/warehouse_dashboard.html -->
+{% extends "_layout.html" %}
+
+{% block title %}Ombor Paneli{% endblock %}
+
+{% block content %}
+<div class="row g-4">
+    <!-- Kirim qilish paneli -->
+    <div class="col-lg-6">
+        <div class="card shadow-sm">
+            <div class="card-header bg-success text-white"><h3><i class="bi bi-box-arrow-in-down"></i> Omborga Kirim Qilish</h3></div>
+            <div class="card-body">
+                <form action="{{ url_for('receive_stock') }}" method="POST">
+                    <div class="mb-3">
+                        <label for="product_id_receive" class="form-label">Mahsulot</label>
+                        <select class="form-select" id="product_id_receive" name="product_id" required>
+                            <option value="" disabled selected>-- Mahsulotni tanlang --</option>
+                            {% for product in products %}
+                            <option value="{{ product.id }}">{{ product.name }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                    <div class="mb-3">
+                        <label for="quantity_receive" class="form-label">Miqdori (dona)</label>
+                        <input type="number" class="form-control" id="quantity_receive" name="quantity" min="1" required>
+                    </div>
+                    <div class="mb-3">
+                        <label for="notes_receive" class="form-label">Izoh (ixtiyoriy)</label>
+                        <input type="text" class="form-control" id="notes_receive" name="notes" placeholder="Masalan: ' поставщик ' dan keldi">
+                    </div>
+                    <button type="submit" class="btn btn-success">Kirim Qilish</button>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- Chiqim qilish paneli -->
+    <div class="col-lg-6">
+        <div class="card shadow-sm">
+            <div class="card-header bg-danger text-white"><h3><i class="bi bi-box-arrow-up"></i> Do'konga Chiqim Qilish</h3></div>
+            <div class="card-body">
+                <form action="{{ url_for('dispatch_stock') }}" method="POST">
+                    <div class="mb-3">
+                        <label for="product_id_dispatch" class="form-label">Mahsulot</label>
+                        <select class="form-select" id="product_id_dispatch" name="product_id" required>
+                            <option value="" disabled selected>-- Mahsulotni tanlang --</option>
+                            {% for product in products %}
+                            <option value="{{ product.id }}">{{ product.name }} (Qoldiq: {{ product.quantity }})</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                    <div class="mb-3">
+                        <label for="quantity_dispatch" class="form-label">Miqdori (dona)</label>
+                        <input type="number" class="form-control" id="quantity_dispatch" name="quantity" min="1" required>
+                    </div>
+                    <div class="mb-3">
+                        <label for="notes_dispatch" class="form-label">Izoh (ixtiyoriy)</label>
+                        <input type="text" class="form-control" id="notes_dispatch" name="notes" placeholder="Masalan: Vitrinaga chiqarildi">
+                    </div>
+                    <button type="submit" class="btn btn-danger">Chiqim Qilish</button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

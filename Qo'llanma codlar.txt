@@ -1,0 +1,13 @@
+-- 1. Qaysi baza bilan ishlashni ko'rsatish
+USE Vican;
+
+-- 2. Barcha tarixiy yozuvlarni o'chirish
+DELETE FROM sales;
+DELETE FROM inventory_movements;
+DELETE FROM expenses;
+
+-- 3. Barcha mijozlarni o'chirish
+DELETE FROM customers;
+
+-- 4. Admin bo'lmagan barcha xodimlarni o'chirish
+DELETE FROM users WHERE role != 'admin';

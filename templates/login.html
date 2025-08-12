@@ -1,0 +1,94 @@
+<!-- templates/login.html -->
+<!DOCTYPE html>
+<html lang="uz">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Tizimga Kirish</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+    <style>
+        body { display: flex; align-items: center; justify-content: center; height: 100vh; background-color: #f8f9fa; }
+        .login-container { max-width: 800px; width: 100%; }
+        .login-card { padding: 2rem; border: none; border-radius: 1rem; box-shadow: 0 4px 8px rgba(0,0,0,0.1); }
+    </style>
+</head>
+<body>
+    <div class="container login-container">
+        <div class="card login-card">
+            <div class="row g-0">
+                <div class="col-md-6">
+                    <h3 class="card-title text-center mb-4">Savdogar AI</h3>
+                    {% with messages = get_flashed_messages(with_categories=true) %}
+                        {% if messages %}
+                            {% for category, message in messages %}
+                                <div class="alert alert-{{ category }}" role="alert">{{ message }}</div>
+                            {% endfor %}
+                        {% endif %}
+                    {% endwith %}
+                    <form action="{{ url_for('login') }}" method="POST">
+                        <div class="mb-3">
+                            <label for="username" class="form-label">Login</label>
+                            <input type="text" class="form-control" id="username" name="username" required>
+                        </div>
+                        <div class="mb-3">
+                            <label for="password" class="form-label">Parol</label>
+                            <input type="password" class="form-control" id="password" name="password" required>
+                        </div>
+                        <div class="d-grid">
+                            <button type="submit" class="btn btn-primary">Kirish</button>
+                        </div>
+                    </form>
+                </div>
+                <div class="col-md-6 border-start-md">
+                    <div class="text-center p-3">
+                        <h5><i class="bi bi-qr-code-scan"></i> QR-kod orqali kirish</h5>
+                        <div id="login-qr-reader" style="width:100%; max-width: 250px; margin: auto;"></div>
+                        <div id="login-qr-results" class="mt-2"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+<script src="https://unpkg.com/html5-qrcode" type="text/javascript"></script>
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+        const resultsDiv = document.getElementById('login-qr-results');
+
+        function onScanSuccess(decodedText, decodedResult) {
+            resultsDiv.innerHTML = `<div class="alert alert-info">Token topildi, tizimga kirilmoqda...</div>`;
+            
+            const formData = new FormData();
+            formData.append('token', decodedText);
+
+            fetch("{{ url_for('qr_login') }}", {
+                method: 'POST',
+                body: formData
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.status === 'success' && data.redirect_url) {
+                    resultsDiv.innerHTML = `<div class="alert alert-success">Muvaffaqiyatli! Yo'naltirilmoqda...</div>`;
+                    window.location.href = data.redirect_url;
+                } else {
+                    resultsDiv.innerHTML = `<div class="alert alert-danger">${data.message || 'Xatolik yuz berdi.'}</div>`;
+                }
+            })
+            .catch(error => {
+                resultsDiv.innerHTML = `<div class="alert alert-danger">Server bilan bog'lanishda xatolik.</div>`;
+            });
+            
+            html5QrcodeScanner.clear();
+        }
+
+        let html5QrcodeScanner = new Html5QrcodeScanner(
+            "login-qr-reader", 
+            { fps: 10, qrbox: 200 },
+            false
+        );
+        html5QrcodeScanner.render(onScanSuccess);
+    });
+</script>
+</body>
+</html>

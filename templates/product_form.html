@@ -1,0 +1,41 @@
+<!-- templates/product_form.html -->
+{% extends "_layout.html" %}
+
+{% block title %}{{ title }}{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-lg-8">
+        <div class="card shadow-sm">
+            <div class="card-header"><h3>{{ title }}</h3></div>
+            <div class="card-body">
+                <form method="POST" action="{{ url_for('edit_product_page', product_id=product.id) if product else url_for('add_product_page') }}">
+                    <div class="mb-3">
+                        <label for="name" class="form-label">Mahsulot Nomi</label>
+                        <input type="text" class="form-control" id="name" name="name" value="{{ product.name if product else '' }}" required>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label for="cost_price" class="form-label">Tannarxi (so'm)</label>
+                            <input type="number" step="0.01" class="form-control" id="cost_price" name="cost_price" value="{{ product.cost_price if product else '' }}" required>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label for="price" class="form-label">Sotuv Narxi (so'm)</label>
+                            <input type="number" step="0.01" class="form-control" id="price" name="price" value="{{ product.price if product else '' }}" required>
+                        </div>
+                    </div>
+                    <div class="mb-3">
+                        <label for="quantity" class="form-label">Miqdori (dona)</label>
+                        <input type="number" class="form-control" id="quantity" name="quantity" value="{{ product.quantity if product else '' }}" required>
+                    </div>
+                    <hr>
+                    <div class="text-end">
+                        <a href="{{ url_for('products_page') }}" class="btn btn-secondary">Bekor qilish</a>
+                        <button type="submit" class="btn btn-primary">Saqlash</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

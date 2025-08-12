@@ -1,0 +1,23 @@
+<!-- templates/qr_code_display.html -->
+{% extends "_layout.html" %}
+
+{% block title %}QR-kod: {{ product.name }}{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-md-6 text-center">
+        <div class="card shadow-sm">
+            <div class="card-header">
+                <h3>{{ product.name }}</h3>
+            </div>
+            <div class="card-body">
+                <p>Ushbu QR-kodni skanerlash orqali mahsulot haqida ma'lumot olish mumkin.</p>
+                <img src="data:image/png;base64,{{ qr_code }}" alt="QR Code for {{ product.name }}" class="img-fluid border rounded p-2">
+                <div class="mt-3">
+                    <a href="{{ url_for('products_page') }}" class="btn btn-secondary">Orqaga</a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

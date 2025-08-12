@@ -1,0 +1,63 @@
+<!-- templates/expenses.html -->
+{% extends "_layout.html" %}
+
+{% block title %}Xarajatlarni Boshqarish{% endblock %}
+
+{% block content %}
+<div class="row g-4">
+    <!-- Yangi xarajat qo'shish -->
+    <div class="col-lg-4">
+        <div class="card shadow-sm">
+            <div class="card-header"><h4>Yangi Xarajat Qo'shish</h4></div>
+            <div class="card-body">
+                <form method="POST" action="{{ url_for('expenses_page') }}">
+                    <div class="mb-3">
+                        <label for="description" class="form-label">Tavsifi</label>
+                        <textarea class="form-control" id="description" name="description" rows="3" required></textarea>
+                    </div>
+                    <div class="mb-3">
+                        <label for="amount" class="form-label">Summasi (so'm)</label>
+                        <input type="number" step="0.01" class="form-control" id="amount" name="amount" required>
+                    </div>
+                    <div class="mb-3">
+                        <label for="expense_date" class="form-label">Sanasi</label>
+                        <input type="date" class="form-control" id="expense_date" name="expense_date" value="{{ today_date }}" required>
+                    </div>
+                    <button type="submit" class="btn btn-success">Qo'shish</button>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- Xarajatlar tarixi -->
+    <div class="col-lg-8">
+        <div class="card shadow-sm">
+            <div class="card-header"><h4>Xarajatlar Tarixi</h4></div>
+            <div class="card-body">
+                <form method="POST" action="{{ url_for('expenses_page') }}" class="mb-3">
+                    <div class="row g-2 align-items-end">
+                        <div class="col"><label for="start_date" class="form-label">Boshlanish</label><input type="date" class="form-control" id="start_date" name="start_date" value="{{ start_date }}"></div>
+                        <div class="col"><label for="end_date" class="form-label">Tugash</label><input type="date" class="form-control" id="end_date" name="end_date" value="{{ end_date }}"></div>
+                        <div class="col-auto"><button type="submit" class="btn btn-primary">Filtrlash</button></div>
+                    </div>
+                </form>
+                <div class="table-responsive">
+                    <table class="table table-hover">
+                        <thead class="table-light"><tr><th>Sanasi</th><th>Tavsifi</th><th>Summasi</th><th>Kiritdi</th></tr></thead>
+                        <tbody>
+                            {% for expense in expenses %}
+                            <tr><td>{{ expense.expense_date.strftime('%Y-%m-%d') }}</td><td>{{ expense.description }}</td><td class="text-danger fw-bold">- {{ expense.amount | format_currency }} so'm</td><td>{{ expense.username }}</td></tr>
+                            {% else %}
+                            <tr><td colspan="4" class="text-center">Bu davr uchun xarajatlar kiritilmagan.</td></tr>
+                            {% endfor %}
+                        </tbody>
+                        {% if expenses %}
+                        <tfoot><tr class="table-light fw-bold"><td colspan="2" class="text-end">Jami:</td><td class="text-danger">- {{ total_expenses | format_currency }} so'm</td><td></td></tr></tfoot>
+                        {% endif %}
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
